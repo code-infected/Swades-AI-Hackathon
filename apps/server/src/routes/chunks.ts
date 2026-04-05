@@ -66,6 +66,10 @@ chunksRouter.post(
       })
       .returning();
 
+    if (!chunk) {
+      return c.json({ success: false, error: "Failed to create chunk" }, 500);
+    }
+
     // Update recording's total chunks count
     await db
       .update(recordings)
