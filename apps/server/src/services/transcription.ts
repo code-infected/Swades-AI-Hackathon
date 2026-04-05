@@ -163,7 +163,7 @@ function groupWordsIntoSegments(
         endTime: word.end,
         confidences: [word.confidence],
       };
-    } else {
+    } else if (currentSegment) {
       // Continue current segment
       currentSegment.words.push(word.word);
       currentSegment.endTime = word.end;
