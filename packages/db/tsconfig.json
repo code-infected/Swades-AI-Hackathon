@@ -1,11 +1,12 @@
 {
-  "extends": "@my-better-t-app/config/tsconfig.base.json",
+  "extends": "../config/tsconfig.base.json",
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
     "composite": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "types": ["node", "bun"]
   }
 }

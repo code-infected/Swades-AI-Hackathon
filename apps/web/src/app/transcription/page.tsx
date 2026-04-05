@@ -136,7 +136,7 @@ function TranscriptViewer({ segments, speakers }: TranscriptViewerProps) {
         </Button>
       </div>
 
-      <div className="max-h-[400px] space-y-3 overflow-y-auto rounded border border-border/50 bg-muted/10 p-4">
+      <div className="max-h-100 space-y-3 overflow-y-auto rounded border border-border/50 bg-muted/10 p-4">
         {segments.map((segment) => (
           <div key={segment.id} className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-xs">
@@ -443,7 +443,7 @@ export default function TranscriptionPage() {
 
               {/* Drop zone */}
               <div
-                className="flex min-h-[100px] cursor-pointer flex-col items-center justify-center gap-2 rounded border-2 border-dashed border-border/50 bg-muted/10 p-4 text-muted-foreground transition-colors hover:border-border hover:bg-muted/20"
+                className="flex min-h-25 cursor-pointer flex-col items-center justify-center gap-2 rounded border-2 border-dashed border-border/50 bg-muted/10 p-4 text-muted-foreground transition-colors hover:border-border hover:bg-muted/20"
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onClick={() => fileInputRef.current?.click()}

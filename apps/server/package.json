@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@deepgram/sdk": "^3.11.2",
-    "@hono/zod-validator": "^0.5.0",
+    "@hono/zod-validator": "^0.7.6",
     "@my-better-t-app/db": "*",
     "@my-better-t-app/env": "*",
     "dotenv": "^17.2.2",
