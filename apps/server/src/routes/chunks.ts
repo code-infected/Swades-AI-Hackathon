@@ -5,7 +5,7 @@ import { db } from "@my-better-t-app/db";
 import { audioChunks, recordings } from "@my-better-t-app/db/schema";
 import { eq } from "drizzle-orm";
 import { env } from "@my-better-t-app/env/server";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, access } from "node:fs/promises";
 import { join } from "node:path";
 
 const chunksRouter = new Hono();
@@ -123,8 +123,8 @@ chunksRouter.get("/:recordingId/:chunkId/verify", async (c) => {
   let fileExists = false;
   if (chunk.filePath) {
     try {
-      const file = Bun.file(chunk.filePath);
-      fileExists = await file.exists();
+      await access(chunk.filePath);
+      fileExists = true;
     } catch {
       fileExists = false;
     }
