@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#e7e5e5",
+                    "secondary": "#9f9da0",
+                    "background": "#0e0e0e",
+                    "inverse-surface": "#fcf9f8",
+                    "tertiary-container": "#ebeaf0",
+                    "secondary-container": "#3b3b3d",
+                    "on-primary-fixed-variant": "#bb0009",
+                    "surface-bright": "#2b2c2c",
+                    "surface-container-low": "#131313",
+                    "surface-container-high": "#1f2020",
+                    "primary-container": "#930005",
+                    "outline-variant": "#484848",
+                    "surface": "#0e0e0e",
+                    "outline": "#767575",
+                    "on-primary": "#870004",
+                    "surface-dim": "#0e0e0e",
+                    "inverse-on-surface": "#565555",
+                    "error-container": "#7f2927",
+                    "inverse-primary": "#c1000a",
+                    "tertiary-dim": "#ebeaf0",
+                    "surface-container-lowest": "#000000",
+                    "on-secondary-fixed": "#3f3f41",
+                    "on-tertiary-fixed": "#484a4e",
+                    "secondary-fixed": "#e4e2e4",
+                    "primary-dim": "#ff9f93",
+                    "on-secondary-fixed-variant": "#5c5b5d",
+                    "tertiary-fixed": "#f3f3f8",
+                    "secondary-dim": "#9f9da0",
+                    "on-tertiary": "#5d5f63",
+                    "surface-tint": "#ffb4aa",
+                    "tertiary-fixed-dim": "#e5e5ea",
+                    "surface-container": "#191a1a",
+                    "on-secondary": "#202022",
+                    "error-dim": "#bb5551",
+                    "on-tertiary-container": "#55575b",
+                    "on-error": "#490106",
+                    "on-primary-container": "#ffc2b9",
+                    "surface-container-highest": "#252626",
+                    "error": "#ee7d77",
+                    "secondary-fixed-dim": "#d6d4d6",
+                    "primary-fixed-dim": "#ffc7c0",
+                    "primary-fixed": "#ffdad5",
+                    "surface-variant": "#252626",
+                    "on-surface-variant": "#acabaa",
+                    "on-tertiary-fixed-variant": "#65666a",
+                    "on-error-container": "#ff9993",
+                    "on-primary-fixed": "#850004",
+                    "tertiary": "#f9f9fe",
+                    "primary": "#ffb4aa",
+                    "on-secondary-container": "#c1bec1",
+                    "on-background": "#e7e5e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .waveform-bar {
+            transition: height 0.2s cubic-bezier(0.2, 0, 0, 1);
+        }
+        .glass-recorder {
+            background: rgba(37, 38, 38, 0.7);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation -->
+<main class="min-h-screen flex flex-col items-center justify-center px-4">
+<!-- Main Recorder Module -->
+<div class="w-full max-w-2xl glass-recorder p-10 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] relative overflow-hidden">
+<!-- Subtle Radial Glow -->
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary-container/10 via-transparent to-transparent pointer-events-none"></div>
+<!-- Waveform Visualizer -->
+<div class="h-32 flex items-end justify-center gap-1 mb-12 bg-surface-container-lowest/50 rounded-xl px-8 py-4">
+<div class="waveform-bar w-1.5 h-8 bg-secondary rounded-full opacity-40"></div>
+<div class="waveform-bar w-1.5 h-12 bg-secondary rounded-full opacity-60"></div>
+<div class="waveform-bar w-1.5 h-20 bg-primary rounded-full"></div>
+<div class="waveform-bar w-1.5 h-16 bg-primary rounded-full"></div>
+<div class="waveform-bar w-1.5 h-24 bg-primary rounded-full"></div>
+<div class="waveform-bar w-1.5 h-14 bg-primary rounded-full"></div>
+<div class="waveform-bar w-1.5 h-28 bg-primary rounded-full"></div>
+<div class="waveform-bar w-1.5 h-18 bg-primary rounded-full"></div>
+<div class="waveform-bar w-1.5 h-22 bg-secondary rounded-full opacity-60"></div>
+<div class="waveform-bar w-1.5 h-10 bg-secondary rounded-full opacity-40"></div>
+<div class="waveform-bar w-1.5 h-6 bg-secondary rounded-full opacity-30"></div>
+</div>
+<!-- Timer Section -->
+<div class="flex flex-col items-center mb-12">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-secondary mb-2">Recording Time</span>
+<div class="font-label text-7xl md:text-8xl font-bold tracking-tight text-tertiary">
+                    00:00:00
+                </div>
+</div>
+<!-- Controls -->
+<div class="flex items-center justify-center gap-8">
+<button class="group flex flex-col items-center gap-2">
+<div class="w-14 h-14 rounded-full border border-outline-variant/30 flex items-center justify-center hover:bg-surface-bright transition-all duration-300">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary">pause</span>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Pause</span>
+</button>
+<!-- Record Button Pulse -->
+<button class="relative group">
+<div class="absolute -inset-2 bg-primary/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-24 h-24 rounded-full bg-primary flex items-center justify-center shadow-lg transform active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;">mic</span>
+</div>
+</button>
+<button class="group flex flex-col items-center gap-2">
+<div class="w-14 h-14 rounded-full border border-outline-variant/30 flex items-center justify-center hover:bg-surface-bright transition-all duration-300">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary">stop</span>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Stop</span>
+</button>
+</div>
+</div>
+<!-- Recorded Chunks List -->
+<div class="w-full max-w-2xl mt-16">
+<div class="flex items-center justify-between px-2 mb-6">
+<h2 class="font-headline font-bold text-xl text-tertiary">Recent Sessions</h2>
+<span class="font-label text-xs text-secondary">3 recordings</span>
+</div>
+<div class="space-y-4">
+<!-- Chunk Row -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="font-label font-bold text-primary">#03</span>
+</div>
+<div>
+<div class="font-headline font-bold text-on-surface group-hover:text-tertiary transition-colors">Vocal Layer_Final_A</div>
+<div class="font-label text-xs text-secondary mt-1">Today • 14:24 • 24-bit PCM</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label text-sm text-secondary mr-4">0:45</span>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">play_circle</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">download</button>
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors">delete</button>
+</div>
+</div>
+<!-- Chunk Row -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="font-label font-bold text-primary">#02</span>
+</div>
+<div>
+<div class="font-headline font-bold text-on-surface group-hover:text-tertiary transition-colors">Ambient Texture_01</div>
+<div class="font-label text-xs text-secondary mt-1">Yesterday • 18:10 • 24-bit PCM</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label text-sm text-secondary mr-4">2:12</span>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">play_circle</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">download</button>
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors">delete</button>
+</div>
+</div>
+<!-- Chunk Row -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="font-label font-bold text-primary">#01</span>
+</div>
+<div>
+<div class="font-headline font-bold text-on-surface group-hover:text-tertiary transition-colors">Draft Melody Idea</div>
+<div class="font-label text-xs text-secondary mt-1">2 days ago • 09:45 • 24-bit PCM</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label text-sm text-secondary mr-4">0:32</span>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">play_circle</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">download</button>
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors">delete</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
