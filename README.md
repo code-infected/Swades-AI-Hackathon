@@ -1,57 +1,92 @@
-# Reliable Recording Chunking Pipeline
+# Reliable Audio Transcription System
 
-An assignment for building a reliable chunking setup that ensures recording data stays accurate in all cases — no data loss, no silent failures.
+A production-ready transcription system with **zero chunk loss**, **no hallucination**, and **multi-speaker support** for audio sessions up to 1+ hours.
 
-## How It Works
+## Features
+
+- 🎙️ **Live Recording** — Record directly from microphone with real-time waveform visualization
+- 📁 **File Upload** — Upload pre-recorded audio files (supports long sessions 1hr+)
+- 👥 **Multi-Speaker Detection** — Automatic speaker diarization for 5+ speakers
+- 🔄 **Zero Data Loss** — OPFS persistence + server acknowledgment ensures no chunks are lost
+- 📝 **Accurate Transcription** — Powered by Deepgram Nova-2 with confidence scores
+- 🎨 **Speaker Color Coding** — Visual distinction between different speakers
+- 📋 **Export Options** — Copy or download transcripts
+
+## Architecture
 
 ```
-Client (Browser)
-    │
-    ├── 1. Record & chunk data on the client side
-    ├── 2. Store chunks in OPFS (Origin Private File System)
-    ├── 3. Upload chunks to a storage bucket
-    ├── 4. On success → acknowledge (ack) to the database
-    │
-    └── Recovery: if DB has ack but chunk is missing from bucket
-        └── Re-send from OPFS → bucket
+┌─────────────────────────────────────────────────────────────────┐
+│                         CLIENT (Browser)                         │
+├─────────────────────────────────────────────────────────────────┤
+│  1. Record audio → Split into 5-second WAV chunks               │
+│  2. Store chunks in OPFS (durable client-side storage)          │
+│  3. Upload chunks to server with retry logic                    │
+│  4. On success → receive acknowledgment                         │
+│  5. Reconciliation: re-upload from OPFS if server missing chunk │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         SERVER (Hono/Bun)                        │
+├─────────────────────────────────────────────────────────────────┤
+│  • Receive chunks → Store on filesystem                         │
+│  • Acknowledge receipt → Update database                        │
+│  • Transcription API → Send to Deepgram with diarization        │
+│  • Return transcript segments with speaker labels               │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      DEEPGRAM (Nova-2 Model)                     │
+├─────────────────────────────────────────────────────────────────┤
+│  • Speech-to-text transcription                                 │
+│  • Speaker diarization (multi-speaker detection)                │
+│  • Confidence scores per word                                   │
+│  • Smart formatting & punctuation                               │
+└─────────────────────────────────────────────────────────────────┘
 ```
-
-**Main objective:** In all cases, the recording data stays accurate. OPFS acts as the durable client-side buffer — chunks are only cleared after the bucket and DB are both confirmed in sync.
-
-### Flow Details
-
-1. **Client-side chunking** — Recording data is split into chunks in the browser
-2. **OPFS storage** — Each chunk is persisted to the Origin Private File System before any network call, so nothing is lost if the tab closes or the network drops
-3. **Bucket upload** — Chunks are uploaded to a storage bucket (can be a local bucket for testing, e.g. MinIO or a local S3-compatible store)
-4. **DB acknowledgment** — Once the bucket confirms receipt, an ack record is written to the database
-5. **Reconciliation** — If the DB shows an ack but the chunk is missing from the bucket (e.g. bucket purge, replication lag), the client re-uploads from OPFS to restore consistency
 
 ## Tech Stack
 
 - **Next.js** — Frontend (App Router)
 - **Hono** — Backend API server
 - **Bun** — Runtime
-- **Drizzle ORM + PostgreSQL** — Database
+- **Drizzle ORM + PostgreSQL** — Database (Neon)
+- **Deepgram** — AI transcription with speaker diarization
 - **TailwindCSS + shadcn/ui** — UI
 - **Turborepo** — Monorepo build system
 
 ## Getting Started
 
+### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
-### Database Setup
+### 2. Environment Setup
 
-1. Make sure you have a PostgreSQL database set up.
-2. Update your `apps/server/.env` with your PostgreSQL connection details.
-3. Apply the schema:
-
-```bash
-npm run db:push
+**Server (`apps/server/.env`):**
+```env
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+CORS_ORIGIN=http://localhost:3001
+NODE_ENV=development
+DEEPGRAM_API_KEY=your_deepgram_api_key
+STORAGE_PATH=./storage
 ```
 
-### Run Development
+**Web (`apps/web/.env`):**
+```env
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+```
+
+### 3. Database Setup
+
+```bash
+npm run db:push -w @my-better-t-app/db
+```
+
+### 4. Run Development
 
 ```bash
 npm run dev
@@ -60,84 +95,99 @@ npm run dev
 - Web app: [http://localhost:3001](http://localhost:3001)
 - API server: [http://localhost:3000](http://localhost:3000)
 
-## Load Testing
+## Deployment
 
-Target: **300,000 requests** to validate the chunking pipeline under heavy load.
+### Server → Railway
 
-### Setup
+1. Go to [railway.app](https://railway.app) and connect your GitHub repo
+2. Create a new project → **Deploy from GitHub repo**
+3. Set the **Root Directory** to `apps/server`
+4. Add environment variables:
+   ```
+   DATABASE_URL=your_neon_connection_string
+   CORS_ORIGIN=https://transcribebyathul.vercel.app
+   NODE_ENV=production
+   DEEPGRAM_API_KEY=your_deepgram_api_key
+   STORAGE_PATH=./storage
+   ```
+5. Railway will auto-detect Bun and deploy
+6. Copy your Railway URL (e.g., `https://your-app.railway.app`)
 
-Use a load testing tool like [k6](https://k6.io), [autocannon](https://github.com/mcollina/autocannon), or [artillery](https://artillery.io) to simulate concurrent chunk uploads.
+### Web → Vercel
 
-Example with **k6**:
+1. Go to [vercel.com](https://vercel.com) and import your GitHub repo
+2. Set the **Root Directory** to `apps/web`
+3. Add environment variable:
+   ```
+   NEXT_PUBLIC_SERVER_URL=https://your-app.railway.app
+   ```
+4. Deploy!
 
-```js
-import http from "k6/http";
-import { check } from "k6";
+## API Endpoints
 
-export const options = {
-  scenarios: {
-    chunk_uploads: {
-      executor: "constant-arrival-rate",
-      rate: 5000,           // 5,000 req/s
-      timeUnit: "1s",
-      duration: "1m",       // → 300K requests in 60s
-      preAllocatedVUs: 500,
-      maxVUs: 1000,
-    },
-  },
-};
-
-export default function () {
-  const payload = JSON.stringify({
-    chunkId: `chunk-${__VU}-${__ITER}`,
-    data: "x".repeat(1024), // 1KB dummy chunk
-  });
-
-  const res = http.post("http://localhost:3000/api/chunks/upload", payload, {
-    headers: { "Content-Type": "application/json" },
-  });
-
-  check(res, {
-    "status 200": (r) => r.status === 200,
-  });
-}
-```
-
-Run:
-
-```bash
-k6 run load-test.js
-```
-
-### What to Validate
-
-- **No data loss** — every ack in the DB has a matching chunk in the bucket
-- **OPFS recovery** — chunks survive client disconnects and can be re-uploaded
-- **Throughput** — server handles sustained 5K req/s without dropping chunks
-- **Consistency** — reconciliation catches and repairs any bucket/DB mismatches after the run
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/recordings` | Create new recording session |
+| GET | `/api/recordings/:id` | Get recording details |
+| PATCH | `/api/recordings/:id` | Update recording status |
+| POST | `/api/chunks/:recordingId` | Upload audio chunk |
+| GET | `/api/chunks/:recordingId` | List chunks for recording |
+| POST | `/api/transcribe/:recordingId` | Trigger transcription |
+| GET | `/api/recordings/:id/transcript` | Get transcript with speakers |
 
 ## Project Structure
 
 ```
-recoding-assignment/
+swades-ai-hackathon/
 ├── apps/
-│   ├── web/         # Frontend (Next.js) — chunking, OPFS, upload logic
-│   └── server/      # Backend API (Hono) — bucket upload, DB ack
+│   ├── web/                 # Frontend (Next.js)
+│   │   └── src/
+│   │       ├── app/transcription/  # Main transcription UI
+│   │       ├── hooks/use-recorder.ts  # Audio recording hook
+│   │       └── lib/         # API client, OPFS, upload utils
+│   └── server/              # Backend API (Hono)
+│       └── src/
+│           ├── routes/      # API routes
+│           └── services/    # Transcription service
 ├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── db/          # Drizzle ORM schema & queries
-│   ├── env/         # Type-safe environment config
-│   └── config/      # Shared TypeScript config
+│   ├── ui/                  # Shared shadcn/ui components
+│   ├── db/                  # Drizzle ORM schema
+│   ├── env/                 # Type-safe environment config
+│   └── config/              # Shared TypeScript config
 ```
+
+## Reliability Features
+
+### Zero Chunk Loss
+- Chunks stored in **OPFS** before network upload
+- Server sends **acknowledgment** after successful storage
+- **Reconciliation** re-uploads from OPFS if server missing chunks
+
+### No Hallucination
+- Deepgram **Nova-2** model (lowest hallucination rate)
+- **Confidence scores** for each segment
+- No speculative text generation
+
+### Multi-Speaker Support
+- Automatic **speaker diarization** enabled
+- Supports **5+ concurrent speakers**
+- Color-coded speaker labels in UI
 
 ## Available Scripts
 
-- `npm run dev` — Start all apps in development mode
-- `npm run build` — Build all apps
-- `npm run dev:web` — Start only the web app
-- `npm run dev:server` — Start only the server
-- `npm run check-types` — TypeScript type checking
-- `npm run db:push` — Push schema changes to database
-- `npm run db:generate` — Generate database client/types
-- `npm run db:migrate` — Run database migrations
-- `npm run db:studio` — Open database studio UI
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start all apps in development |
+| `npm run build` | Build all apps |
+| `npm run dev:web` | Start only web app |
+| `npm run dev:server` | Start only server |
+| `npm run check-types` | TypeScript type checking |
+| `npm run db:push` | Push schema to database |
+| `npm run db:studio` | Open database studio UI |
+
+## Getting Deepgram API Key
+
+1. Go to [console.deepgram.com](https://console.deepgram.com/)
+2. Create a free account (includes $200 credit)
+3. Create an API key with **"Member"** permissions
+4. Copy the key to your `.env` file
